@@ -9,11 +9,15 @@ runtests: test
 	./test
 
 
-main: main.c
+main: main.c utils
 	$(cc) $(flags) -o main $?
 
-test: test.c
+test: utils test.c 
 	$(cc) $(flags) -o test $?
 
+utils: utils.h utils.c
+	$(cc) $(flags) -c -o utils utils.c
+
+
 clean:
-	rm -r main test
+	rm -r main test utils

@@ -1,5 +1,7 @@
 *.sw[op]
 main
 test
+utils
 *.o
 Session.vim
+out
