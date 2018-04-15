@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
+#include "point.h"
 #include "utils.h"
 
 
@@ -17,12 +18,18 @@ int test_frandom();
 int test_frandom_boundaries();
 int test_point_random();
 int test_point_random_boundaries();
+/**
+ * Tests the is_within_circle() primitive, loading data from a fixture
+ * where coordinates of various center points, radiuses and other points are
+ * stored
+ */
+int test_is_within_circle();
 
 
 int main (int argc, char *argv[]) {
 	test_function tests[] = {
 		test_RANDMAX, test_frandom, test_frandom_boundaries,
-		test_point_random, test_point_random_boundaries
+		test_point_random, test_point_random_boundaries, test_is_within_circle
 	};
 	test_function current_test;
 
@@ -89,31 +96,104 @@ int test_frandom_boundaries () {
 }
 
 int test_point_random() {
-	int tries = pow(10, 6);
-	float min = -5, max = 5;
 	point_t p;
-	int i;
+	char *mins = "-100", *maxs = "100";
+	double min = atof(mins), max = atof(maxs);
+	int tries = pow(10, 6), i;
+
+	point_init(&p);
 
 	for (i = 0; i < tries; i++) {
-		assert(point_random(min, max, &p) >= 0);
-		printf("(%f, %f)\n", p.xcord, p.ycord);
+		assert(point_random(&p, mins, maxs) >= 0);
 
-		assert(min <= p.xcord && p.xcord <= max);
-		assert(min <= p.ycord && p.ycord <= max);
+		assert(mpf_cmp_d(p.x, min) > 0 && mpf_cmp_d(p.x, max) < 0);
+		assert(mpf_cmp_d(p.y, min) > 0 && mpf_cmp_d(p.y, max) < 0);
 	}
 
+	point_free(&p);
 	return 0;
 }
 
 int test_point_random_boundaries() {
-	point_t p = {0, 0};
-	
-	assert(point_random(4, -4, &p) == -1);
-	assert(point_random(4, 4, &p) == -1);
-	assert(point_random(0, 0, &p) == -1);
+	point_t p;
 
-	assert(p.xcord == 0);
-	assert(p.ycord == 0);
+	point_init(&p);
+	point_set(&p, "0", "0");
+	
+	assert(point_random(&p, "4", "-4") == -1);
+	assert(point_random(&p, "4", "4") == -1);
+	assert(point_random(&p, "0", "0") == -1);
+
+	assert(mpf_cmp_d(p.x, 0) == 0);
+	assert(mpf_cmp_d(p.y, 0) == 0);
+
+	point_free(&p);
+	return 0;
+}
+
+int test_is_within_circle() {
+	point_t center, p;
+	int buff_size = 256;
+	long double radius;
+	char sradius[buff_size];
+	// Can only belong to {-1, 0, 1} in the .csv file were its value is stored
+	int zone;
+
+	char *filename = "fixtures/test_is_within_circle.csv",
+		 line_buffer[buff_size], error_msg[buff_size];
+	int result, read_values, lineno = 1;
+	FILE *test_data_fp;
+
+	point_init(&center);
+	point_init(&p);
+
+	test_data_fp = fopen(filename, "r");
+
+	if (test_data_fp == NULL) {
+		snprintf(error_msg, buff_size, "Error opening file \"%s\"", filename);
+		perror(error_msg);
+
+		return -1;
+	}
+
+	while (fgets(line_buffer, buff_size, test_data_fp)) {
+		line_buffer[strlen(line_buffer) - 1] = '\0';
+
+		read_values = gmp_sscanf(
+			line_buffer,
+			"%Ff,%Ff,%Lf,%Ff,%Ff,%d",
+			center.x, center.y, &radius, p.x, p.y, &zone
+		);
+		snprintf(sradius, buff_size, "%Lf", radius);
+
+		assert(read_values == 6);
+
+		/*
+			result, as "returned" by is_within_circle(), is negative if the
+			point belongs to the interior points of the circle, zero if it lies over
+			its boundary, and greater than zero if it belongs to the exterior
+			points. The zone variable, however, can assume values only in {-1,
+			0, 1}
+		*/
+		is_within_circle(center, sradius, p, &result);
+
+		gmp_snprintf(
+			error_msg, buff_size,
+			"Error reading line %d (\"%s\"): center = (%Ff, %Ff) p = (%Ff, %Ff) result == %d != zone == %d",
+			lineno, line_buffer, center.x, center.y, p.x, p.y, result, zone
+		);
+		ASSERT_MSG(result == zone, error_msg, 1);
+
+		lineno++;
+	}
+
+	if (fclose(test_data_fp) == EOF) {
+		snprintf(error_msg, buff_size, "Error while closing file \"%s\"", filename);
+		perror(error_msg);
+	}
+
+	point_free(&p);
+	point_free(&center);
 
 	return 0;
 }
