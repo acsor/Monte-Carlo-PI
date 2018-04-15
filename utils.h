@@ -4,12 +4,13 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define RANDMAX(max) random() % max
+#define ASSERT_MSG(expression, msg, code)\
+	if (!(expression)) {\
+		fprintf(stderr, "Assertion error at %s:%d: %s\n", __FILE__, __LINE__, (msg));\
+		exit(code);\
+	}
 
-typedef struct {
-	double xcord;
-	double ycord;
-} point_t;
+#define RANDMAX(max) random() % max
 
 /**
  * Returns a floating-point pseudo-random value contained within min and max,
@@ -19,16 +20,7 @@ typedef struct {
  * 0 on success;
  * -1 if max is not strictly greater than min.
  */
-int frandom(float min, float max, double *result);
-/**
- * Returns a floating-point bidimensional point_t value with pseudo random
- * components, both bounded by min and max.
- *
- * Returns:
- * 0 on success;
- * -1 if max is not strictly greater than min.
- */
-int point_random(float min, float max, point_t *result);
+int frandom(long double min, long double max, long double *result);
 
 
 #endif

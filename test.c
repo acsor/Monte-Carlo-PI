@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <assert.h>
 #include "utils.h"
@@ -31,10 +32,12 @@ int main (int argc, char *argv[]) {
 	for (i = 0; i < tests_no; i++) {
 		current_test = tests[i];
 
+		printf("Test %d... ", i + 1);
+
 		if (current_test() == 0) {
-			fprintf(stderr, "Test %d... OK\n", i + 1);
+			puts("OK");
 		} else {
-			fprintf(stderr, "Test %d... FAILED\n", i + 1);
+			puts("failed");
 		}
 	}
 
@@ -59,7 +62,7 @@ int test_RANDMAX() {
 int test_frandom() {
 	int tries = pow(10, 6);
 	float min = -5, max = 5;
-	double r;
+	long double r;
 	int i;
 
 	for (i = 0; i < tries; i++) {
@@ -73,7 +76,7 @@ int test_frandom() {
 }
 
 int test_frandom_boundaries () {
-	double r = 0;
+	long double r = 0;
 
 	assert(frandom(4, -4, &r) == -1);
 	assert(frandom(4, 4, &r) == -1);
