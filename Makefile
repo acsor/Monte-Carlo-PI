@@ -16,6 +16,9 @@ main: main.c utils
 	$(cc) $(flags) -o main $?
 
 
+main: utils point main.c 
+	$(cc) $(flags) $(libs) -o main $?
+
 test: utils point test.c 
 	$(cc) $(flags) $(libs) -o test $?
 
@@ -24,6 +27,9 @@ scratches: utils scratches.c
 
 utils: utils.h utils.c
 	$(cc) $(flags) -c -o utils utils.c
+
+point: point.h point.c
+	$(cc) $(flags) -c -o point point.c
 
 
 clean: main test utils scratches point
