@@ -1,36 +1,41 @@
 cc=gcc
 flags=-Wall
 libs=-lm -lpthread -lgmp
+FIXDIR=fixtures/
 
 
-run: main
-	./main
+run: main.out
+	./main.out
 
-testrun: testfixtures test
-	./test
+testrun: test.out
+	./test.out
 
-scratchesrun: scratches
-	./scratches
+scratchesrun: scratches.out
+	./scratches.out
 
-testfixtures: fixtures.py
+
+main.out: utils.o point.o main.c
+	$(cc) $(flags) $(libs) -o main.out $?
+
+# fixtures/test_is_within_circle.csv is an order-only prerequisite
+test.out: utils.o point.o test.c | fixtures/test_is_within_circle.csv
+	$(cc) $(flags) $(libs) -o test.out utils.o point.o test.c
+
+scratches.out: utils.o point.o scratches.c
+	$(cc) $(flags) $(libs) -o scratches.out $?
+
+utils.o: utils.h utils.c
+	$(cc) $(flags) -c utils.c
+
+point.o: point.h point.c
+	$(cc) $(flags) -c point.c
+
+fixtures/test_is_within_circle.csv: fixtures.py
 	python3.6 ./fixtures.py
 
 
-main: utils point main.c 
-	$(cc) $(flags) $(libs) -o main $?
-
-test: utils point test.c 
-	$(cc) $(flags) $(libs) -o test $?
-
-scratches: utils point scratches.c
-	$(cc) $(flags) $(libs) -o scratches $?
-
-utils: utils.h utils.c
-	$(cc) $(flags) -c -o utils utils.c
-
-point: point.h point.c
-	$(cc) $(flags) -c -o point point.c
+clean: *.o *.out
+	rm $?
 
 
-clean: main test utils scratches point
-	rm -r $?
+.PHONY: run testrun scratchesrun clean

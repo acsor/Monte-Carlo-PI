@@ -1,11 +1,7 @@
 *.sw[op]
-main
-test
-utils
-point
 *.o
+*.out
 Session.vim
-out
 fixtures/*.csv
 .RData
 .Rhistory
