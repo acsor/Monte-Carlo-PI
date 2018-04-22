@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
+#include <gmp.h>
 #include "point.h"
 #include "utils.h"
 
@@ -24,27 +25,29 @@ int test_point_random_boundaries();
  * stored
  */
 int test_is_within_circle();
+int test_urandomb_between();
 
 
 int main (int argc, char *argv[]) {
 	test_function tests[] = {
 		test_RANDMAX, test_frandom, test_frandom_boundaries,
-		test_point_random, test_point_random_boundaries, test_is_within_circle
+		test_point_random, test_point_random_boundaries, test_is_within_circle,
+		test_urandomb_between
 	};
 	test_function current_test;
 
-	int i;
 	size_t tests_no = sizeof(tests) / sizeof(test_function);
+	int i;
 
 	for (i = 0; i < tests_no; i++) {
 		current_test = tests[i];
 
-		printf("Test %d... ", i + 1);
+		fprintf(stderr, "Test %d... ", i + 1);
 
 		if (current_test() == 0) {
-			puts("OK");
+			fputs("OK\n", stderr);
 		} else {
-			puts("failed");
+			fputs("failed\n", stderr);
 		}
 	}
 
@@ -67,11 +70,10 @@ int test_RANDMAX() {
 }
 
 int test_frandom() {
-	int tries = pow(10, 6);
+	long int tries = pow(10, 6);
 	float min = -5, max = 5;
 	long double r;
-	int i;
-
+	long int i; 
 	for (i = 0; i < tries; i++) {
 		assert(frandom(min, max, &r) >= 0);
 
@@ -82,7 +84,7 @@ int test_frandom() {
 	return 0;
 }
 
-int test_frandom_boundaries () {
+int test_frandom_boundaries() {
 	long double r = 0;
 
 	assert(frandom(4, -4, &r) == -1);
@@ -99,35 +101,46 @@ int test_point_random() {
 	point_t p;
 	char *mins = "-100", *maxs = "100";
 	double min = atof(mins), max = atof(maxs);
-	int tries = pow(10, 6), i;
+	int tries = pow(10, 5), i;
+	gmp_randstate_t rstate;
 
+	gmp_randinit_default(rstate);
 	point_init(&p);
 
+	gmp_randseed_ui(rstate, random());
+
 	for (i = 0; i < tries; i++) {
-		assert(point_random(&p, mins, maxs) >= 0);
+		assert(point_random(&p, rstate, mins, maxs) >= 0);
 
 		assert(mpf_cmp_d(p.x, min) > 0 && mpf_cmp_d(p.x, max) < 0);
 		assert(mpf_cmp_d(p.y, min) > 0 && mpf_cmp_d(p.y, max) < 0);
 	}
 
 	point_free(&p);
+	gmp_randclear(rstate);
+
 	return 0;
 }
 
 int test_point_random_boundaries() {
 	point_t p;
+	gmp_randstate_t rstate;
 
+	gmp_randinit_default(rstate);
 	point_init(&p);
+
 	point_set(&p, "0", "0");
 	
-	assert(point_random(&p, "4", "-4") == -1);
-	assert(point_random(&p, "4", "4") == -1);
-	assert(point_random(&p, "0", "0") == -1);
+	assert(point_random(&p, rstate, "4", "-4") == -1);
+	assert(point_random(&p, rstate, "4", "4") == -1);
+	assert(point_random(&p, rstate, "0", "0") == -1);
 
 	assert(mpf_cmp_d(p.x, 0) == 0);
 	assert(mpf_cmp_d(p.y, 0) == 0);
 
 	point_free(&p);
+	gmp_randclear(rstate);
+
 	return 0;
 }
 
@@ -194,6 +207,36 @@ int test_is_within_circle() {
 
 	point_free(&p);
 	point_free(&center);
+
+	return 0;
+}
+
+int test_urandomb_between() {
+	long int tries = pow(10, 5);
+	const char *min = "-10", *max = "10";
+	long int i;
+	gmp_randstate_t rstate;
+	mpf_t rvalue;
+
+	gmp_randinit_default(rstate);
+	mpf_inits(rvalue, NULL);
+
+	// Prepares random state
+	// TO-DO Use another seed. For Linux systems /dev/random should be a rather
+	// good choice
+	gmp_randseed_ui(rstate, random());
+
+	for (i = 0; i < tries; i++) {
+		mpf_urandomb_between(rvalue, rstate, min, max);
+
+		if (mpf_cmp_d(rvalue, atof(min)) < 0 || mpf_cmp_d(rvalue, atof(max)) > 0) {
+			gmp_fprintf(stderr, "%L <= %Ff <= %L not true\n", min, rvalue, max);
+			return -1;
+		}
+	}
+
+	mpf_clears(rvalue, NULL);
+	gmp_randclear(rstate);
 
 	return 0;
 }

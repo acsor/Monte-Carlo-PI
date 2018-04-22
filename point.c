@@ -39,8 +39,7 @@ void point_free(point_t *p) {
 	mpf_clears(p->x, p->y, NULL);
 }
 
-int point_random(point_t *result, const char *min, const char *max) {
-	// TO-DO Finish implementing
+int point_random(point_t *result, gmp_randstate_t rstate, const char *min, const char *max) {
 	mpf_t gmp_min, gmp_max;
 	mpf_inits(gmp_min, gmp_max, NULL);
 
@@ -53,7 +52,11 @@ int point_random(point_t *result, const char *min, const char *max) {
 		return -1;
 	}
 
+	mpf_urandomb_between(result->x, rstate, min, max);
+	mpf_urandomb_between(result->y, rstate, min, max);
+
 	mpf_clears(gmp_min, gmp_max, NULL);
+
 	return 0;
 }
 

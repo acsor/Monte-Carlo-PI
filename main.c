@@ -1,20 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <gmp.h>
 #include <pthread.h>
+#include <assert.h>
+#include <gmp.h>
+#include "point.h"
 
 
 void generate_points(void *args);
 
 
 int main (int c, char *argv[]) {
-	mpf_t v;
-
-	mpf_init(v);
-	mpf_set_str(v, "3.141592653589793", 10);
-
-	mpf_clear(v);
+	puts("Work in progress!");
 
 	return EXIT_SUCCESS;
 }

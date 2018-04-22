@@ -3,6 +3,8 @@
 
 #include <math.h>
 #include <gmp.h>
+#include <assert.h>
+#include "utils.h"
 
 #define FLOAT_PRECISION 32
 
@@ -31,7 +33,7 @@ void point_free(point_t *p);
  * 0 on success;
  * -1 if max is not strictly greater than min.
  */
-int point_random(point_t *result, const char *min, const char *max);
+int point_random(point_t *result, gmp_randstate_t rstate, const char *min, const char *max);
 /**
  * Stores a return value result such that:
  *  result > 0 if the point_t p is outside the circle described by center and radius;

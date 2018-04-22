@@ -1,6 +1,7 @@
 *.sw[op]
 *.o
 *.out
+out
 Session.vim
 fixtures/*.csv
 .RData

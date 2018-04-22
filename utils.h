@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <gmp.h>
+#include "point.h"
 
 #define ASSERT_MSG(expression, msg, code)\
 	if (!(expression)) {\
@@ -21,6 +23,14 @@
  * -1 if max is not strictly greater than min.
  */
 int frandom(long double min, long double max, long double *result);
+/**
+ * Sets rop to a randomly-computed value between min and max.
+ *
+ * Returns:
+ * 0 on success;
+ * -1 if max is equal or less than min.
+ */
+int mpf_urandomb_between(mpf_t rop, gmp_randstate_t rstate, const char *min, const char *max);
 
 
 #endif
