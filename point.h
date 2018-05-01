@@ -6,7 +6,7 @@
 #include <assert.h>
 #include "utils.h"
 
-#define FLOAT_PRECISION 32
+#define FLOAT_PRECISION 64
 
 typedef struct {
 	mpf_t x, y;

@@ -10,7 +10,7 @@
 typedef void (*void_procedure)(void);
 
 void add();
-void test_ASSERT_MSG();
+void test_center_set();
 void test_mpf_sub();
 void test_gmp_sscanf();
 void random_point_display();
@@ -18,13 +18,14 @@ void random_point_display();
 
 int main (int c, char *argv[]) {
 	void_procedure procedures[] = {
-		add, test_ASSERT_MSG, test_mpf_sub, test_gmp_sscanf, random_point_display
+		add, test_center_set, test_mpf_sub, test_gmp_sscanf, random_point_display
 	};
 	const size_t n = sizeof(procedures) / sizeof(void_procedure);
 	int choice, buffsize = 256;
 	char input[buffsize];
 
 	do {
+		printf("THIS FILE CONTAINS EXPERIMENTATION CODE, OF EXCLUSIVE INTEREST FOR DEVELOPERS.\n");
 		printf("Which procedure do you wish to run? [%d - %lu] ", 0, n - 1);
 
 		fgets(input, buffsize, stdin);
@@ -51,13 +52,18 @@ void add() {
 	} while (read != 2);
 	mpf_add(result, a, b);
 
-	gmp_printf("%.Ff + %.Ff = %Ff\n", a, b, result);
+	gmp_printf("%.Ff + %.Ff = %.Ff\n", a, b, result);
 
 	mpf_clears(a, b, result, NULL);
 }
 
-void test_ASSERT_MSG() {
-	ASSERT_MSG(1 == 0, "I'm sorry, I couldn't do it!", 1);
+void test_center_set() {
+	point_t c;
+
+	point_init(&c);
+	point_set(&c, "0", "0");
+
+	gmp_printf("c = (%Ff, %Ff)\n", c.x, c.y);
 }
 
 void test_mpf_sub() {

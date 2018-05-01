@@ -37,5 +37,7 @@ fixtures/test_is_within_circle.csv: fixtures.py
 clean: *.o *.out
 	rm $^
 
+todo:
+	grep --color -PRi -C 3 --exclude=[mM]akefile --exclude=*.sw[op] to-do
 
 .PHONY: run testrun scratchesrun clean

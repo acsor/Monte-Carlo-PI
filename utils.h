@@ -11,8 +11,8 @@
 		fprintf(stderr, "Assertion error at %s:%d: %s\n", __FILE__, __LINE__, (msg));\
 		exit(code);\
 	}
-
-#define RANDMAX(max) random() % max
+#define RANDMAX(max) (random() % max)
+#define WHERE_AM_I() printf("%s:%u\n", __FILE__, __LINE__)
 
 /**
  * Returns a floating-point pseudo-random value contained within min and max,
