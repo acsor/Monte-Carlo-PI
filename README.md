@@ -1,7 +1,7 @@
 # Monte Carlo PI
 
-`Monte Carlo PI` explores and implements a stochastic solution to the
-calculation of the notable mathematical constant π. It uses
+`Monte Carlo PI` explores and implements a randomized solution to the
+calculation of the mathematical constant π. It uses
 the Pthreads library and the [GNU Multiple Precision Arithmetic Library
 (GMP)](https://gmplib.org/) for dealing with as precise as possible
 floating-point numbers.
@@ -24,13 +24,13 @@ make testrun
 ```
 
 ## Credits
-`Monte Carlo PI` was inspired by the book `Operating System Concepts` by
-Silberschatz et al., pages 193-194 (9th edition).
+`Monte Carlo PI` was inspired by the book [Operating System
+Concepts](http://codex.cs.yale.edu/avi/os-book/OS9/), 9th
+edition by A. Silberschatz et al., pages 193-194.
 
 ### Problem statement
-#### From *Operating System Concepts*, 9th edition pp. 193-194
 An interesting way of calculating π is to use a technique known as ***Monte
-Carlo***, which involves randomization. This technique works as follows:
+Carlo***, which involves randomization. This technique works as follows:  
 Suppose you have a circle inscribed within a square, as shown in Figure 4.18.
 (Assume that the radius of this circle is 1.) First, generate a series of
 random points as simple *(x, y)* coordinates. These points must fall within the
@@ -42,7 +42,7 @@ Next, estimate π by performing the following calculation:
 ```
 Write a multithreaded version of this algorithm that creates a separate thread
 to generate a number of random points. The thread will count the number of
-points that occur within the circle and store that result in a global variable.
+points that occur within the circle and store that result in a global variable.  
 When this thread has exited, the parent thread will calculate and output the
 estimated value of π. It is worth experimenting with the number of random
 points generated. As a general rule, the greater the number of points, the
